@@ -12,7 +12,7 @@ expected_results = {
         'copy_number': 44.0,
         'gene': 'CDK4',
         'chromosome': 'chr12',
-        'attributes': {'number-of-exons': '7 of 7'}
+        'attributes': {'number-of-exons': '7 of 7', 'ratio': 11.63}
     }, {
         'status': 'gain',
         'sample_id': 'SA-1612348',
@@ -21,7 +21,7 @@ expected_results = {
         'copy_number': 6.0,
         'gene': 'CCND3',
         'chromosome': 'chr6',
-        'attributes': {'number-of-exons': '5 of 5'}
+        'attributes': {'number-of-exons': '5 of 5', 'ratio': 2.17}
     }, {
         'status': 'loss',
         'sample_id': 'SA-1612348',
@@ -30,7 +30,7 @@ expected_results = {
         'copy_number': 41.0,
         'gene': 'MYC',
         'chromosome': 'chr8',
-        'attributes': {'number-of-exons': '5 of 5'}
+        'attributes': {'number-of-exons': '5 of 5', 'ratio': 10.34}
     }, {
         'status': 'partial_loss',
         'sample_id': 'SA-1612348',
@@ -39,7 +39,7 @@ expected_results = {
         'copy_number': 6.0,
         'gene': 'PIM1',
         'chromosome': 'chr6',
-        'attributes': {'number-of-exons': '7 of 7'}
+        'attributes': {'number-of-exons': '7 of 7', 'ratio': 2.14}
     }, {
         'status': 'gain',
         'sample_id': 'SA-1612348',
@@ -48,7 +48,7 @@ expected_results = {
         'copy_number': 7.0,
         'gene': 'RAD21',
         'chromosome': 'chr8',
-        'attributes': {'partial amplification': True, 'number-of-exons': '13 of 13'}
+        'attributes': {'partial amplification': True, 'number-of-exons': '13 of 13', 'ratio': 2.69}
     }]
 }
 
@@ -210,7 +210,7 @@ class ConvertTest(TestCase):
                 '@sample': 'SA-1612348'
             }
         }
-        self.assertEqual({'number-of-exons': '13 of 13', 'partial amplification': True}, gather_attributes(copy_number))
+        self.assertEqual({'number-of-exons': '13 of 13', 'partial amplification': True, 'ratio': 2.69}, gather_attributes(copy_number))
 
     def test_gather_attributes_with_partial_amplification(self):
         copy_number = {
@@ -226,7 +226,7 @@ class ConvertTest(TestCase):
                 '@sample': 'SA-1612348'
             }
         }
-        self.assertEqual({'number-of-exons': '13 of 13'}, gather_attributes(copy_number))
+        self.assertEqual({'number-of-exons': '13 of 13', 'ratio': 2.69}, gather_attributes(copy_number))
 
     def test_gather_attributes_with_no_exons(self):
         copy_number = {
@@ -235,6 +235,20 @@ class ConvertTest(TestCase):
             '@copy-number': '7',
             '@equivocal': 'true',
             '@ratio': 2.69,
+            '@status': 'known',
+            '@type': 'loss',
+            'dna-evidence': {
+                '@sample': 'SA-1612348'
+            }
+        }
+        self.assertEqual({'ratio': 2.69}, gather_attributes(copy_number))
+
+    def test_gather_attributes_with_no_ratio(self):
+        copy_number = {
+            '@gene': 'RAD21',
+            '@position': 'chr8:117859738-117878968',
+            '@copy-number': '7',
+            '@equivocal': 'true',
             '@status': 'known',
             '@type': 'loss',
             'dna-evidence': {
