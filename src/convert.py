@@ -38,6 +38,8 @@ def gather_attributes(copy_number):
         attributes['number-of-exons'] = copy_number['@number-of-exons']
     if '@type' in copy_number.keys() and copy_number['@type'] == 'partial amplification':
         attributes['partial amplification'] = True
+    if '@ratio' in copy_number.keys():
+        attributes['ratio'] = copy_number['@ratio']
 
     return attributes
 
