@@ -2,6 +2,7 @@ from unittest import TestCase
 from src.convert import extract_copy_numbers
 from src.convert import calculate_status
 from src.convert import gather_attributes
+from src.convert import calculate_interpretation
 
 expected_results = {
     'CopyNumbers': [{
@@ -109,7 +110,7 @@ foundation_source_dict = {
                     '@copy-number': '6',
                     '@equivocal': 'true',
                     '@ratio': 2.17,
-                    '@status': 'known',
+                    '@status': 'likely',
                     '@type': 'amplification',
                     '@number-of-exons': '5 of 5',
                     'dna-evidence': {
@@ -122,7 +123,7 @@ foundation_source_dict = {
                     '@copy-number': '41',
                     '@equivocal': 'false',
                     '@ratio': 10.34,
-                    '@status': 'known',
+                    '@status': 'unknown',
                     '@type': 'loss',
                     '@number-of-exons': '5 of 5',
                     'dna-evidence': {
@@ -135,7 +136,7 @@ foundation_source_dict = {
                     '@copy-number': '6',
                     '@equivocal': 'true',
                     '@ratio': 2.14,
-                    '@status': 'known',
+                    '@status': 'ambiguous',
                     '@type': 'loss',
                     '@number-of-exons': '7 of 7',
                     'dna-evidence': {
@@ -196,6 +197,13 @@ class ConvertTest(TestCase):
         self.assertEqual('gain', calculate_status('true', 'partial amplification'))
         self.assertEqual('', calculate_status('true', 'fred'))
 
+    def test_calculate_interpretation(self):
+        self.assertEqual('Pathogenic', calculate_interpretation('known'))
+        self.assertEqual('Likely pathogenic', calculate_interpretation('likely'))
+        self.assertEqual('Uncertain significance', calculate_interpretation('unknown'))
+        self.assertEqual('other', calculate_interpretation('ambiguous'))
+        self.assertEqual('', calculate_interpretation('fred'))
+
     def test_gather_attributes_with_partial_amplification(self):
         copy_number = {
             '@gene': 'RAD21',
@@ -251,6 +259,18 @@ class ConvertTest(TestCase):
             '@equivocal': 'true',
             '@status': 'known',
             '@type': 'loss',
+            'dna-evidence': {
+                '@sample': 'SA-1612348'
+            }
+        }
+        self.assertEqual({'status': 'loss'}, gather_attributes(copy_number))
+
+    def test_gather_attributes_with_no_type(self):
+        copy_number = {
+            '@gene': 'RAD21',
+            '@position': 'chr8:117859738-117878968',
+            '@copy-number': '7',
+            '@equivocal': 'true',
             'dna-evidence': {
                 '@sample': 'SA-1612348'
             }

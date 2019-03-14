@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import csv
-import json
+import json, ast
 import logging
 
 import xmltodict
@@ -32,14 +32,32 @@ def calculate_status(equivocal, copy_type):
     return ''
 
 
+def calculate_interpretation(status):
+    if status == 'known':
+        return 'Pathogenic'
+    if status == 'likely':
+        return 'Likely pathogenic'
+    if status == 'unknown':
+        return 'Uncertain significance'
+    if status == 'ambiguous':
+        return 'other'
+
+    logger.error('Failed to resolve interpretation: %s', status)
+    return ''
+
+
 def gather_attributes(copy_number):
     attributes = {}
     if '@number-of-exons' in copy_number.keys():
         attributes['number-of-exons'] = copy_number['@number-of-exons']
-    if '@type' in copy_number.keys() and copy_number['@type'] == 'partial amplification':
-        attributes['partial amplification'] = True
+    if '@type' in copy_number.keys():
+        attributes['status'] = copy_number['@type']
     if '@ratio' in copy_number.keys():
         attributes['ratio'] = copy_number['@ratio']
+    if '@status' in copy_number.keys():
+        attributes['interpretation'] = calculate_interpretation(copy_number['@status'])
+    if '@status' in copy_number.keys():
+        attributes['interpretation'] = copy_number['@status']
 
     return attributes
 
@@ -62,9 +80,10 @@ def extract_copy_numbers(results_payload_dict):
                                      'chromosome': copy_number['@position'].split(":")[0],
                                      'start_position': copy_number['@position'].split(":")[1].split("-")[0],
                                      'end_position': copy_number['@position'].split(":")[1].split("-")[1],
-                                     'attributes': gather_attributes(copy_number)}
+                                     'attributes': gather_attributes(copy_number),
+                                     'interpretation': calculate_interpretation(copy_number['@status'])}
 
-                copy_number_list['CopyNumbers'].append(copy_number_value)
+                copy_number_list['CopyNumbers'].append(ast.literal_eval(json.dumps(copy_number_value)))
 
     return copy_number_list
 
@@ -75,11 +94,11 @@ def write_copy_numbers_to_cnv(cnv_dict, args):
     with open(args.out_file, 'wb') as csvfile:
         csv_writer = csv.writer(csvfile, delimiter=',')
         csv_writer.writerow(['sample_id', 'gene', 'copy_number', 'status', 'attributes',
-                             'chromosome', 'start_position', 'end_position'])
+                             'chromosome', 'start_position', 'end_position', 'interpretation'])
         for cnv in cnv_dict['CopyNumbers']:
             csv_writer.writerow([cnv['sample_id'], cnv['gene'], cnv['copy_number'],
                                  cnv['status'], cnv['attributes'], cnv['chromosome'],
-                                 cnv['start_position'], cnv['end_position']])
+                                 cnv['start_position'], cnv['end_position'], cnv['interpretation']])
 
 
 def main():
