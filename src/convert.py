@@ -55,8 +55,6 @@ def gather_attributes(copy_number):
     if '@ratio' in copy_number.keys():
         attributes['ratio'] = copy_number['@ratio']
     if '@status' in copy_number.keys():
-        attributes['interpretation'] = calculate_interpretation(copy_number['@status'])
-    if '@status' in copy_number.keys():
         attributes['interpretation'] = copy_number['@status']
 
     return attributes
