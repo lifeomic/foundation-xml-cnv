@@ -81,7 +81,7 @@ foundation_source_dict = {
     'variant-report': {
         'samples': {
             'sample': {
-                '@name': 'sample1'
+                '@name': 'SA-1612348'
             }
         },
         'short-variants': {
@@ -161,10 +161,7 @@ foundation_source_dict = {
                     '@ratio': 2.69,
                     '@status': 'known',
                     '@type': 'partial amplification',
-                    '@number-of-exons': '13 of 13',
-                    'dna-evidence': {
-                        '@sample': 'SA-1612348'
-                    }
+                    '@number-of-exons': '13 of 13'
                 }
             ]
         },

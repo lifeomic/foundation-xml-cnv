@@ -67,11 +67,13 @@ def extract_copy_numbers(results_payload_dict):
     if 'copy-number-alterations' in results_payload_dict['variant-report'].keys():
         if (results_payload_dict['variant-report']['copy-number-alterations'] is not None and
                 'copy-number-alteration' in results_payload_dict['variant-report']['copy-number-alterations'].keys()):
+
+            sample_id = results_payload_dict['variant-report'].get('samples', {}).get('sample', {}).get('@name')
             variants_dict = results_payload_dict['variant-report']['copy-number-alterations']['copy-number-alteration']
             copy_numbers = variants_dict if isinstance(variants_dict, list) else [variants_dict]
 
             for copy_number in copy_numbers:
-                copy_number_value = {'sample_id': copy_number['dna-evidence']['@sample'],
+                copy_number_value = {'sample_id': copy_number.get('dna-evidence', {}).get('@sample', sample_id),
                                      'gene': copy_number['@gene'],
                                      'copy_number': float(format(copy_number['@copy-number'])),
                                      'status': calculate_status(copy_number['@equivocal'], copy_number['@type']),
