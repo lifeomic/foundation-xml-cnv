@@ -60,6 +60,21 @@ def gather_attributes(copy_number):
     return attributes
 
 
+def extract_sample(samples):
+    if not samples:
+        return None
+
+    sample = samples.get('samples', {}).get('sample', {})
+    if isinstance(sample, list):
+        # Multiple sample (rna/dna) provided, find dna:
+        dna_samples = [s for s in sample if s.get('@nucleic-acid-type', None) == 'DNA']
+        if dna_samples and len(dna_samples) >= 1:
+            return dna_samples[0].get('@name', None)
+        return None
+
+    return sample.get('@name', None)
+
+
 def extract_copy_numbers(results_payload_dict):
     logger.info('Extracting copy numbers from xml')
     copy_number_list = {'CopyNumbers': []}
@@ -68,7 +83,7 @@ def extract_copy_numbers(results_payload_dict):
         if (results_payload_dict['variant-report']['copy-number-alterations'] is not None and
                 'copy-number-alteration' in results_payload_dict['variant-report']['copy-number-alterations'].keys()):
 
-            sample_id = results_payload_dict['variant-report'].get('samples', {}).get('sample', {}).get('@name')
+            sample_id = extract_sample(results_payload_dict['variant-report'])
             variants_dict = results_payload_dict['variant-report']['copy-number-alterations']['copy-number-alteration']
             copy_numbers = variants_dict if isinstance(variants_dict, list) else [variants_dict]
 
