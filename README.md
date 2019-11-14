@@ -1,5 +1,5 @@
-[![Build Status]
+# foundation-xml-cnv
 
-# foundation-xml-fhir
+[![Build Status]
 
 Docker image for converting FoundationOne XML reports into CNV (copy number variation) comma delimited files
