@@ -106,7 +106,7 @@ def extract_copy_numbers(results_payload_dict):
 def write_copy_numbers_to_cnv(cnv_dict, args):
     logger.info('Saving copy numbers to cnv file')
 
-    with open(args.out_file, 'wb') as csvfile:
+    with open(args.out_file, 'w') as csvfile:
         csv_writer = csv.writer(csvfile, delimiter=',')
         csv_writer.writerow(['sample_id', 'gene', 'copy_number', 'status', 'attributes',
                              'chromosome', 'start_position', 'end_position', 'interpretation'])
